@@ -1,0 +1,41 @@
+Index Performance
+
+
+# Search distribution
+
+index=_internal (sourcetype="searches" OR SavedSplunker) earliest=-24h | stats count by splunk_server
+
+
+# Index Performance
+
+index=_internal (host=INDEXER ) sourcetype=splunkd component=Metrics group=queue (name=aggqueue OR name=splunktcpin OR name=parsingqueue OR name=typingqueue OR name=indexqueue) 
+| eval max=if(isnotnull(max_size_kb),max_size_kb,max_size) 
+| eval curr=if(isnotnull(current_size_kb),current_size_kb,current_size) 
+| eval fill_perc=round((curr/max)*100,2) 
+| timechart p90(fill_perc) by name
+
+#injest voluem by event count
+
+index=_internal source=*metrics.log "group=thruput" "name=index_thruput" | timechart span=1d sum(ev) as events by splunk_server
+
+# Search Performance 
+
+
+
+
+
+# search response time by indexer
+
+index=_internal host=INDEXER sourcetype=splunkd_remote_searches savedsearch_name=*
+| where elapsedTime>100
+| timechart span=5m max(elapsedTime) by savedsearch_name
+
+# skipped search by indexer
+
+index=_internal (sourcetype="searches" OR SavedSplunker) earliest=-24h | stats count by splunk_server
+
+
+
+
+
+
