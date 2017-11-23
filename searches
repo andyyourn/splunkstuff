@@ -4,7 +4,8 @@ Index Performance
 # Search distribution
 
 index=_internal (sourcetype="searches" OR SavedSplunker) earliest=-24h | stats count by splunk_server
-
+# cluster search completeion and distribution
+index=_internal sourcetype=splunkd component=Metrics group=searchscheduler host=splunksearchhead* | timechart span=1h sum(completed), sum(skipped) by host
 
 # Index Performance
 
